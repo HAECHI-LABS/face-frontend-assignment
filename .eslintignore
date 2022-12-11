@@ -1,0 +1,10 @@
+__generate__
+**/dist/**
+**/build/**
+**/node_modules/**
+**/*.test.{js,jsx,ts,tsx}
+**/*.spec.{js,jsx,ts,tsx}
+**/*.config.*
+**/coverage/**
+.eslintrc.js
+*.js
