@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from "react";
+import React, { useState } from 'react';
 import './App.css';
-import {FaceSDK} from "@face/sdk";
+import { FaceSDK } from '@face/sdk';
 
 function App() {
   const [sdk] = useState(new FaceSDK());
@@ -12,19 +12,27 @@ function App() {
 
   async function clickSendTransaction() {
     // todo: amount는 input 창에서 받도록 수정 @steve
-    const amount = "0.01";
+    const amount = '0.01';
     const transactionHash = await sdk.sendTransaction(amount);
     console.log(transactionHash);
   }
 
   return (
     <div className="App">
-      <header className="App-header">
-        <div style={{display: "flex", padding: "10px"}}>
-          <button style={{margin: "10px", padding: "7px"}} onClick={clickCreateWallet}> SignUp/SignIn</button>
-          <button style={{margin: "10px", padding: "7px"}} onClick={clickSendTransaction}> SendTransaction</button>
+      <div className="box">
+        <button className="btn" onClick={clickCreateWallet}>
+          SignUp/SignIn
+        </button>
+      </div>
+      <div className="box">
+        <div className="label">Amount</div>
+        <div className="input-wrapper">
+          <input type="number" className="input-text" placeholder="0.00" />
         </div>
-      </header>
+        <button className="btn" onClick={clickSendTransaction} disabled>
+          SendTransaction
+        </button>
+      </div>
     </div>
   );
 }

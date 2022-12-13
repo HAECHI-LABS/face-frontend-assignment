@@ -12,7 +12,6 @@ const overlayStyles: Partial<CSSStyleDeclaration> = {
 
 function applyOverlayStyles(elem: HTMLElement) {
   for (const [cssProperty, value] of Object.entries(overlayStyles)) {
-    /* eslint-disable-next-line no-param-reassign */
     (elem.style as any)[cssProperty as any] = value;
   }
 }
@@ -35,21 +34,23 @@ class Ready {
   };
 }
 
-class Iframe {
+export class Iframe {
   private readonly _iframe!: Promise<HTMLIFrameElement>;
   private readonly _ready = new Ready();
   private activeElement: any = null;
+  private requestIndex = 1;
 
   constructor(iframeUrl: string) {
     if (document.getElementById('face-iframe')) {
-      throw new Error('Face is already initialized, Face can be initialized once.');
+      console.error('Face is already initialized, Face can be initialized once.');
+      return;
     }
 
     window.addEventListener('message', async (e) => {
       if (e.origin !== iframeUrl) {
         return;
       }
-      await this.processMessage(e.data);
+      await this.handleMessageFromIframe(e.data);
     });
 
     this._iframe = new Promise((resolve) => {
@@ -58,31 +59,35 @@ class Iframe {
           const iframe = document.createElement('iframe');
           iframe.id = 'face-iframe';
           iframe.title = 'Secure Modal';
-          iframe.src = new URL(
-            `${iframeUrl}`
-          ).href;
+          iframe.src = new URL(`${iframeUrl}`).href;
           iframe.allow = 'clipboard-read; clipboard-write';
+          iframe.onload = () => {
+            this._ready.complete();
+          };
           applyOverlayStyles(iframe);
           document.body.appendChild(iframe);
           resolve(iframe);
         }
       };
 
-      // Check DOM state and load...
       if (['loaded', 'interactive', 'complete'].includes(document.readyState)) {
         onload();
       } else {
-        // ...or check load events to load
         window.addEventListener('load', onload, false);
       }
     });
   }
 
-  // iframe과 통신하는 로직을 작성해주세요
   async postMessage(data: any): Promise<string> {
     await this.ready();
+    data.id = (this.requestIndex++).toString();
     (await this._iframe)?.contentWindow?.postMessage(data, '*');
-    return "1";
+    return data.id;
+  }
+
+  // todo: iframe과 통신하는 로직을 작성해주세요 (iframe의 request 메시지 처리)
+  async handleMessageFromIframe(data: any): Promise<string> {
+    throw new Error('implement me');
   }
 
   waitForMessage<T>(requestId?: string): Promise<T> {
@@ -101,10 +106,6 @@ class Iframe {
       };
       window.addEventListener('message', listener);
     });
-  }
-
-  async processMessage(message: any): Promise<void> {
-
   }
 
   async ready(): Promise<void> {

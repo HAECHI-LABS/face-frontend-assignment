@@ -1,18 +1,21 @@
 {
   "name": "root",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "build": "yarn run build",
     "test": "yarn run test",
-    "bootstrap": "yarn install && lerna exec yarn install && lerna exec yarn build",
+    "bootstrap": "yarn install && lerna exec yarn install",
     "fmt": "prettier --write '**/*.{js,jsx,ts,tsx}'",
     "check": "prettier --check '**/*.{js,jsx,ts,tsx}'",
     "lint": "eslint --fix '**/*.{js,jsx,ts,tsx}'"
   },
   "devDependencies": {
-    "lerna": "^5.1.2",
-    "typescript": "^4.7.4",
-    "prettier": "=2.7.1",
+    "@typescript-eslint/eslint-plugin": "^5.41.0",
+    "@typescript-eslint/parser": "^5.41.0",
+    "eslint": "8.22.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-chai-expect": "^3.0.0",
     "eslint-plugin-eslint-plugin": "^5.0.2",
@@ -20,9 +23,9 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.41.0",
-    "@typescript-eslint/parser": "^5.41.0",
-    "eslint": "8.22.0"
+    "lerna": "^5.1.2",
+    "prettier": "^2.8.1",
+    "typescript": "^4.7.4"
   },
   "dependencies": {
     "ts-node": "^10.9.1",
