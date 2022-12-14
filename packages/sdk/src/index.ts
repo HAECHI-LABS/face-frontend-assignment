@@ -12,7 +12,12 @@ export class FaceSDK {
   // 만약 이미 local storage에 private key가 존재한다면 private key를 생성하지 않고 private key의 public address를 SDK에 전달합니다.
   async createWallet(): Promise<string> {
     this.iframe.showOverlay();
-    throw new Error('implement me');
+    alert('implement me');
+    setTimeout(() => {
+      this.iframe.hideOverlay();
+    }, 3000);
+
+    return '';
   }
 
   // todo: iframe을 활용하여 트랜잭션 전송 페이지를 띄우고 지갑을 생성하세요.

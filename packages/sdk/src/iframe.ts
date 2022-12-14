@@ -46,13 +46,6 @@ export class Iframe {
       return;
     }
 
-    window.addEventListener('message', async (e) => {
-      if (e.origin !== iframeUrl) {
-        return;
-      }
-      await this.handleMessageFromIframe(e.data);
-    });
-
     this._iframe = new Promise((resolve) => {
       const onload = () => {
         if (!document.getElementById('face-iframe')) {
@@ -78,6 +71,25 @@ export class Iframe {
     });
   }
 
+  async ready(): Promise<void> {
+    return new Promise(async (resolve) => {
+      if (this._ready.isCompleted()) {
+        resolve();
+        return;
+      }
+
+      this._ready.add(() => {
+        resolve();
+      });
+    });
+  }
+
+  /**
+   * iframe으로 데이터 전송한다.
+   * iframe에서는 window.removeEventListener('message', listener) 를 통해 데이터를 받을 수 있다.
+   * @param {object} data - iframe으로 전송하고자 하는 데이터
+   * @returns {string} - 전송한 메시지에 할당된 id 값. 이 값으로 해당 메시지에 대한 응답을 받을 수 있다.
+   */
   async postMessage(data: any): Promise<string> {
     await this.ready();
     data.id = (this.requestIndex++).toString();
@@ -85,11 +97,12 @@ export class Iframe {
     return data.id;
   }
 
-  // todo: iframe과 통신하는 로직을 작성해주세요 (iframe의 request 메시지 처리)
-  async handleMessageFromIframe(data: any): Promise<string> {
-    throw new Error('implement me');
-  }
-
+  /**
+   * requestId에 해당하는 응답 메시지를 받으면 그 결과를 반환한다.
+   * requestId는 this.postMessage에서 메시지에 할당해준다.
+   * @param {string} requestId - 응답을 받고자 하는 메시지의 id
+   * @returns {any} - 응답 메시지 데이터
+   */
   waitForMessage<T>(requestId?: string): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       const listener = (event: MessageEvent) => {
@@ -108,19 +121,9 @@ export class Iframe {
     });
   }
 
-  async ready(): Promise<void> {
-    return new Promise(async (resolve) => {
-      if (this._ready.isCompleted()) {
-        resolve();
-        return;
-      }
-
-      this._ready.add(() => {
-        resolve();
-      });
-    });
-  }
-
+  /**
+   * iframe 요소를 화면에 보여준다.
+   */
   async showOverlay() {
     await this.ready();
     const iframe = await this._iframe;
@@ -128,7 +131,9 @@ export class Iframe {
     this.activeElement = document.activeElement;
     iframe.focus();
   }
-
+  /**
+   * iframe 요소를 숨긴다.
+   */
   async hideOverlay() {
     await this.ready();
     const iframe = await this._iframe;
